@@ -6,4 +6,19 @@
         <br>Current bid: {{ bid.value }}
         <br><i>Category: {{ listing.category.get_category_type_display }}</i>
         <br><img src=" {{ listing.photo_url }}" alt=" {{ listing.title }}" style="max-width: 300px">
+        {% if user.is_authenticated %}
+                <form action="{% url 'comment' listing.id %}" method="POST">
+                        {% csrf_token %}
+                        {{ form }}
+                        <input type="submit" value="Add Comment">
+                </form>
+        {% endif %}
+        <ul style="list-style: none; padding: 0px">
+        {% for comment in comments %}
+                <li>{{ comment.content }}<br><i>added on {{ comment.date }}</i></li>
+                <br>
+        {% empty %}
+                No comments yet!
+        {% endfor %}
+        </ul>
 {% endblock %}

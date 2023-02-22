@@ -8,3 +8,6 @@ class ListingForm(forms.Form):
     photo_url = forms.URLField(label="Photo's URL", max_length=500, required=False)
     starting_bid = forms.IntegerField(label="Starting Bid", validators=[MinValueValidator(1)])
     category = forms.ChoiceField(label="Category", choices=Category.CATEGORIES)
+    
+class CommentForm(forms.Form):
+    content = forms.CharField(label="Your comment", max_length=2500)

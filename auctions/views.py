@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .forms import ListingForm
-from .models import User, Listing, Category, Bid
+from .forms import ListingForm, CommentForm
+from .models import User, Listing, Category, Bid, Comment
 import datetime
 
 
@@ -83,8 +83,7 @@ def createlisting(request):
             newListing.save()
             firstBid = Bid(owner=user, value=starting_bid, listing=newListing, date=datetime.datetime.now())
             firstBid.save()
-            
-            
+
             
         return HttpResponseRedirect(reverse("index"))
     else:
@@ -94,9 +93,12 @@ def createlisting(request):
         
 @login_required
 def viewlisting(request, id):
+    listing = Listing.objects.get(id=id)
     return render(request, "auctions/viewlisting.html", {
-        "listing": Listing.objects.get(id=id),
-        "bid": Bid.objects.get(listing=Listing.objects.get(id=id))
+        "listing": listing,
+        "bid": Bid.objects.get(listing=Listing.objects.get(id=id)),
+        "form": CommentForm(),
+        "comments": listing.listing_comment.order_by('date')
     })
     
     
@@ -117,4 +119,18 @@ def category(request, category):
         "listings": listings,
         "category": category
     })
-    
+
+def comment(request, id):
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            content = form.cleaned_data['content']
+            listing = Listing.objects.get(id=id)
+            date = datetime.datetime.now()
+            newComment = Comment(owner=user, content=content, listing=listing, date=date)
+            newComment.save()
+    return redirect('viewlisting', id=int(id))
+
+def watchlist(request):
+    return render(request, "auctions/watchlist.html")
