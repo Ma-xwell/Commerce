@@ -3,5 +3,25 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
+    <ul style="list-style: none; padding: 0px">
+    {% for listing in listings %}
+        <li>
+        <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.id %}'">
+        <div class="listingimage">
+            <img src=" {{ listing.photo_url }}" alt="{{ listing.title }}">
+        </div>
+        <div class="listingcontent">
+            <h4><strong>{{ listing.title }}</strong></h4>
+            <div class="description">{{ listing.content }}</div>
+            <br><strong>Price:</strong> {{ listing.listing_bid.first.value }}
+            <br><i>Category: {{ listing.category.get_category_type_display }}</i>
+        </div>
+        
+        </div>
+        </li>
+    {% empty %}
+        No listings yet!
+    {% endfor%}
+    </ul>
+
 {% endblock %}

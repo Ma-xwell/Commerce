@@ -3,12 +3,17 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
-from .models import User
+from django.contrib.auth.decorators import login_required
+from .forms import ListingForm
+from .models import User, Listing, Category, Bid
+import datetime
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html", {
+        "listings": Listing.objects.all(),
+        "bid": Bid.objects.order_by('value')
+    })
 
 
 def login_view(request):
@@ -61,3 +66,35 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+@login_required
+def createlisting(request):
+    if request.method == "POST":
+        form = ListingForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            title = form.cleaned_data['title']
+            content = form.cleaned_data['content']
+            photo_url = form.cleaned_data['photo_url']
+            starting_bid = form.cleaned_data['starting_bid']
+            category_type = form.cleaned_data['category']
+            category = Category.objects.get(category_type=category_type)
+            newListing = Listing(owner=user, title=title, content=content, photo_url=photo_url, starting_bid=starting_bid, category=category, date=datetime.datetime.now())
+            newListing.save()
+            firstBid = Bid(owner=user, value=starting_bid, listing=newListing, date=datetime.datetime.now())
+            firstBid.save()
+            
+            
+            
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        return render(request, "auctions/createlisting.html", {
+            "form": ListingForm()
+        })
+        
+@login_required
+def viewlisting(request, id):
+    return render(request, "auctions/viewlisting.html", {
+        "listing": Listing.objects.get(id=id),
+        "bid": Bid.objects.get(listing=Listing.objects.get(id=id))
+    })
