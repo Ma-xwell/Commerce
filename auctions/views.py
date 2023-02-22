@@ -98,3 +98,23 @@ def viewlisting(request, id):
         "listing": Listing.objects.get(id=id),
         "bid": Bid.objects.get(listing=Listing.objects.get(id=id))
     })
+    
+    
+def categories(request):
+    return render(request, "auctions/categories.html", {
+        "categories": Category.CATEGORIES
+    })
+    
+def category(request, category):
+    category_type = None
+    for category_name in Category.CATEGORIES:
+        if category_name[1] == category:
+            category_type = category_name[0]
+            break
+    
+    listings = Listing.objects.filter(category=Category.objects.get(category_type=category_type))
+    return render(request, "auctions/category.html", {
+        "listings": listings,
+        "category": category
+    })
+    
