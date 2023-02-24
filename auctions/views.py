@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .forms import ListingForm, CommentForm
-from .models import User, Listing, Category, Bid, Comment
+from .models import User, Listing, Category, Bid, Comment, Watchlist
 import datetime
 
 
@@ -84,7 +84,6 @@ def createlisting(request):
             firstBid = Bid(owner=user, value=starting_bid, listing=newListing, date=datetime.datetime.now())
             firstBid.save()
 
-            
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/createlisting.html", {
@@ -97,8 +96,9 @@ def viewlisting(request, id):
     return render(request, "auctions/viewlisting.html", {
         "listing": listing,
         "bid": Bid.objects.get(listing=Listing.objects.get(id=id)),
-        "form": CommentForm(),
-        "comments": listing.listing_comment.order_by('date')
+        "form_comment": CommentForm(),
+        "comments": listing.listing_comment.all().order_by('-date'),
+        "watchlist": Watchlist.objects.filter(owner=request.user, listing=listing).exists()
     })
     
     
@@ -134,3 +134,16 @@ def comment(request, id):
 
 def watchlist(request):
     return render(request, "auctions/watchlist.html")
+
+def addtowatchlist(request, id):
+    if request.method == "POST":
+        listing = Listing.objects.get(id=id)
+        if not Watchlist.objects.filter(owner=request.user, listing=listing).exists():
+            newWatchlist = Watchlist(owner=request.user, listing=listing)
+            newWatchlist.save()
+            print(Watchlist.objects.filter(owner=request.user, listing=listing))
+        else:
+            Watchlist.objects.filter(owner=request.user, listing=listing).delete()
+            print(Watchlist.objects.filter(owner=request.user, listing=listing))
+
+    return redirect('viewlisting', id=int(id))

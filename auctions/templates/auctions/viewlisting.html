@@ -2,6 +2,16 @@
 
 {% block body %}
         <h4><strong>Listing: {{ listing.title }}</strong></h4>
+        {% if user.is_authenticated %}
+                <form action="{% url 'addtowatchlist' listing.id %}" method="POST">
+                        {% csrf_token %}
+                        {% if watchlist == True %}
+                                <input type="submit" value="Remove from watchlist">
+                        {% else %}
+                                <input type="submit" value="Add to watchlist">
+                        {% endif %}
+                </form>
+        {% endif %}
         {{ listing.content }}
         <br>Current bid: {{ bid.value }}
         <br><i>Category: {{ listing.category.get_category_type_display }}</i>
@@ -9,7 +19,8 @@
         {% if user.is_authenticated %}
                 <form action="{% url 'comment' listing.id %}" method="POST">
                         {% csrf_token %}
-                        {{ form }}
+                        {{ form_comment }}
+                       
                         <input type="submit" value="Add Comment">
                 </form>
         {% endif %}
