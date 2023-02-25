@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>Watchlist</h1>
+    {% for listing in watchlist %}
+        <li>
+        <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.listing.id %}'">
+        <div class="listingimage">
+            <img src="{{ listing.listing.photo_url }}" alt="{{ listing.listing.title }}">
+        </div>
+        <div class="listingcontent">
+            <h4><strong>{{ listing.listing.title }}</strong></h4>
+            <form action="{% url 'addtowatchlist' listing.listing.id %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" value="watchlist" name="addorremove">
+                <button type="submit" class="btn-close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </form>
+            <div class="description">{{ listing.listing.content }}</div>
+            <br><strong>Price:</strong> {{ listing.listing.listing_bid.first.value }}
+            <br><i>Category: {{ listing.listing.category.get_category_type_display }}</i>
+        </div>
+        </div>
+        </li>
+    {% empty %}
+        <h2>No listings on your watchlist!</h2>
+    {% endfor %}
+{% endblock %}
