@@ -1,7 +1,11 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Listing in <strong>{{ category }}</strong> category</h2>
+    {% if category == "No category" %}
+        <h2>Listings without category specified</h2>
+    {% else %}
+        <h2>Listing in <strong>{{ category }}</strong> category</h2>
+    {% endif %}
     <ul style="list-style: none; padding: 0px">
         {% for listing in listings %}
             <li>
@@ -12,7 +16,7 @@
             <div class="listingcontent">
                 <h4><strong>{{ listing.title }}</strong></h4>
                 <div class="description">{{ listing.content }}</div>
-                <br><strong>Price:</strong> {{ listing.listing_bid.first.value }}
+                <br><strong>Price:</strong> ${{ listing.listing_bid.last.value }}
                 <br><i>Category: {{ listing.category.get_category_type_display }}</i>
             </div>
             </div>

@@ -16,7 +16,7 @@
                 <button type="submit" class="btn-close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </form>
             <div class="description">{{ listing.listing.content }}</div>
-            <br><strong>Price:</strong> {{ listing.listing.listing_bid.first.value }}
+            <br><strong>Price:</strong> ${{ listing.listing.listing_bid.first.value }}
             <br><i>Category: {{ listing.listing.category.get_category_type_display }}</i>
         </div>
         </div>

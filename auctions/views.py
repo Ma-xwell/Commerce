@@ -1,17 +1,18 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .forms import ListingForm, CommentForm
-from .models import User, Listing, Category, Bid, Comment, Watchlist
+from .models import User, Listing, Category, Bid, Comment, Watchlist, Winner
 import datetime
 
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.all(),
+        "listings": Listing.objects.filter(active=True),
         "bid": Bid.objects.order_by('value')
     })
 
@@ -77,8 +78,10 @@ def createlisting(request):
             content = form.cleaned_data['content']
             photo_url = form.cleaned_data['photo_url']
             starting_bid = form.cleaned_data['starting_bid']
-            category_type = form.cleaned_data['category']
-            category = Category.objects.get(category_type=category_type)
+            if form.cleaned_data['category']:
+                category = Category.objects.get(category_type=form.cleaned_data['category'])
+            else:
+                category = Category.objects.get(category_type="O")
             newListing = Listing(owner=user, title=title, content=content, photo_url=photo_url, starting_bid=starting_bid, category=category, date=datetime.datetime.now())
             newListing.save()
             firstBid = Bid(owner=user, value=starting_bid, listing=newListing, date=datetime.datetime.now())
@@ -90,17 +93,50 @@ def createlisting(request):
             "form": ListingForm()
         })
         
-@login_required
 def viewlisting(request, id):
     listing = Listing.objects.get(id=id)
-    return render(request, "auctions/viewlisting.html", {
-        "listing": listing,
-        "bid": Bid.objects.get(listing=Listing.objects.get(id=id)),
-        "form_comment": CommentForm(),
-        "comments": listing.listing_comment.all().order_by('-date'),
-        "watchlist": Watchlist.objects.filter(owner=request.user, listing=listing).exists()
-    })
+    bidcounter = Bid.objects.filter(listing=Listing.objects.get(id=id)).count()
     
+    if Winner.objects.filter(listing=listing).exists():
+        winner = Winner.objects.get(listing=listing).winner
+    else:
+        winner = None
+   
+    if bidcounter < 1:
+        bidcounter = 1
+    if request.user.is_authenticated:
+        if Bid.objects.filter(listing=listing).count() > 1:
+            # ~Q excludes bid, which was the initial bid of listing owner
+            # It allows to prompt "Your bid is the highest" to the user who placed a bid at the same value as the auction's creator
+            highestbidowner = Bid.objects.filter(~Q(owner=listing.owner), listing=listing,).order_by('-value').first().owner
+        else:
+            highestbidowner = Bid.objects.filter(listing=listing,).order_by('-value').first().owner
+        return render(request, "auctions/viewlisting.html", {
+            "listing": listing,
+            "bid": Bid.objects.filter(listing=Listing.objects.get(id=id)).order_by('-value'),
+            "bidcounter": bidcounter,
+            "form_comment": CommentForm(),
+            "comments": listing.listing_comment.all().order_by('-date'),
+            "watchlist": Watchlist.objects.filter(owner=request.user, listing=listing).exists(),
+            "winner": winner,
+            "highestbidowner": highestbidowner
+        })
+    else:
+        return render(request, "auctions/viewlisting.html", {
+            "listing": listing,
+            "bid": Bid.objects.filter(listing=Listing.objects.get(id=id)).order_by('-value'),
+            "bidcounter": bidcounter,
+            "form_comment": CommentForm(),
+            "comments": listing.listing_comment.all().order_by('-date'),
+            "winner": winner
+        })
+
+def userlistings(request, username):
+    user = User.objects.get(username=username)
+    return render(request, "auctions/userlistings.html", {
+        "listings": Listing.objects.filter(owner=user),
+        "bid": Bid.objects.order_by('value')
+    })
     
 def categories(request):
     return render(request, "auctions/categories.html", {
@@ -114,7 +150,7 @@ def category(request, category):
             category_type = category_name[0]
             break
     
-    listings = Listing.objects.filter(category=Category.objects.get(category_type=category_type))
+    listings = Listing.objects.filter(category=Category.objects.get(category_type=category_type), active=True)
     return render(request, "auctions/category.html", {
         "listings": listings,
         "category": category
@@ -151,3 +187,57 @@ def addtowatchlist(request, id):
     else:
         return redirect('viewlisting', id=int(id))
     
+def placebid(request, id):
+    if request.method == "POST":
+        bidvalue = float(request.POST.get("bidvalue"))
+        listing = Listing.objects.get(id=id)
+        highestbid = float(Bid.objects.filter(listing=listing).order_by('-value').first().value)
+        bidcounter = Bid.objects.filter(listing=listing).count()
+        if bidcounter == 1:
+            if bidvalue >= highestbid:
+                newBid = Bid(owner=request.user, value=bidvalue, listing=listing, date=datetime.datetime.now())
+                newBid.save()
+            else:
+                # Error - TODO
+                return redirect('viewlisting', id=int(id))
+        else:
+            if bidvalue > highestbid:
+                newBid = Bid(owner=request.user, value=bidvalue, listing=listing, date=datetime.datetime.now())
+                newBid.save()
+            else:
+                # Error - TODO
+                return redirect('viewlisting', id=int(id))
+    return redirect('viewlisting', id=int(id))
+
+def closelisting(request, id):
+    # Closing the listing
+    listing = Listing.objects.get(id=id)
+    listing.active = False
+    listing.save()
+    # Saving winner
+    highestbid = Bid.objects.filter(listing=listing).order_by('-value').first()
+    winner = Winner(winner=highestbid.owner, listing=listing)
+    winner.save()
+    return redirect('viewlisting', id=int(id))
+
+def closedlistings(request):
+    return render(request, "auctions/closedlistings.html", {
+        "listings": Listing.objects.filter(active=False),
+        "bid": Bid.objects.order_by('value')
+    })
+
+@login_required
+def wonlistings(request):
+    # Excluding listings which were created by the logged user
+    # The only listings won by the creator are the ones closed without any external bid
+    # Such listings won't be shown as "won", but will be present in "My listings" tab
+    
+    # List of listing IDs which logged user is not an owner of
+    listing_ids = Listing.objects.filter(~Q(owner=request.user)).values_list('id', flat=True)
+    # QuerySet of listings which were won by the logged user, but without these which were created by them
+    wonlistings = Winner.objects.filter(winner=request.user, listing__id__in=listing_ids)
+    
+    
+    return render(request, "auctions/wonlistings.html", {
+        "listings": wonlistings
+    })

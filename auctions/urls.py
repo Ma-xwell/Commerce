@@ -13,5 +13,10 @@ urlpatterns = [
     path("categories/<str:category>", views.category, name="category"),
     path("comment/<int:id>", views.comment, name="comment"),
     path("watchlist", views.watchlist, name="watchlist"),
-    path("addtowachlist/<int:id>", views.addtowatchlist, name="addtowatchlist")
+    path("addtowachlist/<int:id>", views.addtowatchlist, name="addtowatchlist"),
+    path("placebid/<int:id>", views.placebid, name="placebid"),
+    path("closelisting/<int:id>", views.closelisting, name="closelisting"),
+    path("closedlistings", views.closedlistings, name="closedlistings"),
+    path("userlistings/<str:username>", views.userlistings, name="userlistings"),
+    path("wonlistings", views.wonlistings, name="wonlistings")
 ]
