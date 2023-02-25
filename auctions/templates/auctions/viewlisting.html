@@ -5,6 +5,7 @@
         {% if user.is_authenticated %}
                 <form action="{% url 'addtowatchlist' listing.id %}" method="POST">
                         {% csrf_token %}
+                        <input type="hidden" value="viewlisting" name="addorremove">
                         {% if watchlist == True %}
                                 <input type="submit" value="Remove from watchlist">
                         {% else %}

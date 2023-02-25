@@ -133,7 +133,10 @@ def comment(request, id):
     return redirect('viewlisting', id=int(id))
 
 def watchlist(request):
-    return render(request, "auctions/watchlist.html")
+    watchlist = Watchlist.objects.filter(owner=request.user)
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": watchlist
+    })
 
 def addtowatchlist(request, id):
     if request.method == "POST":
@@ -141,9 +144,10 @@ def addtowatchlist(request, id):
         if not Watchlist.objects.filter(owner=request.user, listing=listing).exists():
             newWatchlist = Watchlist(owner=request.user, listing=listing)
             newWatchlist.save()
-            print(Watchlist.objects.filter(owner=request.user, listing=listing))
         else:
             Watchlist.objects.filter(owner=request.user, listing=listing).delete()
-            print(Watchlist.objects.filter(owner=request.user, listing=listing))
-
-    return redirect('viewlisting', id=int(id))
+    if request.POST.get("addorremove") == "watchlist":
+        return redirect('watchlist')
+    else:
+        return redirect('viewlisting', id=int(id))
+    
