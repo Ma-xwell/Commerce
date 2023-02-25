@@ -1,0 +1,26 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% for listing in listings %}
+        <li>
+        <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.id %}'">
+        <div class="listingimage">
+            <img src="{{ listing.photo_url }}" alt="{{ listing.title }}">
+        </div>
+        <div class="listingcontent">
+            <h4><strong>{{ listing.title }}</strong></h4>
+            <div class="description">{{ listing.content }}</div>
+            <br><strong>Price:</strong> ${{ listing.listing_bid.last.value }}
+            <br><i>Category: {{ listing.category.get_category_type_display }}</i>
+        </div>
+        {% if listing.active %}
+            <span style="color: green">ACTIVE</span>
+        {% else %}
+            <span style="color: red">INACTIVE</span>
+        {% endif %}
+        </div>
+        </li>
+    {% empty %}
+        You have no listings.
+    {% endfor%}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Won listings</h2>
+    <h5>Below is the list of all the auction you have won!</h5>
+    <h5>Congratulations!</h5>
+    <ul style="list-style: none; padding: 0px">
+    {% for listing in listings %}
+        <li>
+        <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.listing.id %}'">
+        <div class="listingimage">
+            <img src="{{ listing.listing.photo_url }}" alt="{{ listing.title }}">
+        </div>
+        <div class="listingcontent">
+            <h4><strong>{{ listing.listing.title }}</strong></h4>
+            <div class="description">{{ listing.listing.listing_won.content }}</div>
+            <br><strong>Final price:</strong> ${{ listing.listing.listing_bid.last.value }}
+            <br><i>Category: {{ listing.listing.category.get_category_type_display }}</i>
+        </div>
+        </div>
+        </li>
+    {% empty %}
+        You have not won any auction yet.
+    {% endfor%}
+{% endblock %}
