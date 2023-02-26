@@ -1,5 +1,7 @@
 {% extends "auctions/layout.html" %}
 
+{% load humanize %}
+
 {% block body %}
     {% if category == "No category" %}
         <h2>Listings without category specified</h2>
@@ -16,7 +18,7 @@
             <div class="listingcontent">
                 <h4><strong>{{ listing.title }}</strong></h4>
                 <div class="description">{{ listing.content }}</div>
-                <br><strong>Price:</strong> ${{ listing.listing_bid.last.value }}
+                <br><strong>Price:</strong> ${{ listing.listing_bid.last.value|floatformat:2|intcomma }}
                 <br><i>Category: {{ listing.category.get_category_type_display }}</i>
             </div>
             </div>

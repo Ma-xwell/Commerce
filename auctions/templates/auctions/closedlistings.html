@@ -1,5 +1,7 @@
 {% extends "auctions/layout.html" %}
 
+{% load humanize %}
+
 {% block body %}
     <h2>Inactive Listings</h2>
     <ul style="list-style: none; padding: 0px">
@@ -12,7 +14,7 @@
         <div class="listingcontent">
             <h4><strong>{{ listing.title }}</strong></h4>
             <div class="description">{{ listing.content }}</div>
-            <br><strong>Final price:</strong> ${{ listing.listing_bid.last.value }}
+            <br><strong>Final price:</strong> ${{ listing.listing_bid.last.value|floatformat:2|intcomma }}
             <br><i>Category: {{ listing.category.get_category_type_display }}</i>
         </div>
         </div>

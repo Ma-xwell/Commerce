@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.db import IntegrityError
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -198,14 +199,14 @@ def placebid(request, id):
                 newBid = Bid(owner=request.user, value=bidvalue, listing=listing, date=datetime.datetime.now())
                 newBid.save()
             else:
-                # Error - TODO
+                messages.error(request, 'Your bid must equal or higher than the current one.')
                 return redirect('viewlisting', id=int(id))
         else:
             if bidvalue > highestbid:
                 newBid = Bid(owner=request.user, value=bidvalue, listing=listing, date=datetime.datetime.now())
                 newBid.save()
             else:
-                # Error - TODO
+                messages.error(request, 'Your bid must be higher than the current one.')
                 return redirect('viewlisting', id=int(id))
     return redirect('viewlisting', id=int(id))
 
