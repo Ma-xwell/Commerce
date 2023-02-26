@@ -85,6 +85,7 @@ def createlisting(request):
                 category = Category.objects.get(category_type="O")
             newListing = Listing(owner=user, title=title, content=content, photo_url=photo_url, starting_bid=starting_bid, category=category, date=datetime.datetime.now())
             newListing.save()
+            # Starting bid is the first bid on each listing
             firstBid = Bid(owner=user, value=starting_bid, listing=newListing, date=datetime.datetime.now())
             firstBid.save()
 
@@ -102,7 +103,7 @@ def viewlisting(request, id):
         winner = Winner.objects.get(listing=listing).winner
     else:
         winner = None
-   
+    # Get rid of error that might appear due to changes in Django admin interface
     if bidcounter < 1:
         bidcounter = 1
     if request.user.is_authenticated:
@@ -178,11 +179,15 @@ def watchlist(request):
 def addtowatchlist(request, id):
     if request.method == "POST":
         listing = Listing.objects.get(id=id)
+        # If no watchlist for logged user and specific listing exists, then create one
         if not Watchlist.objects.filter(owner=request.user, listing=listing).exists():
             newWatchlist = Watchlist(owner=request.user, listing=listing)
             newWatchlist.save()
+        # If watchlist for logged user and specific listing exists, delete it
         else:
             Watchlist.objects.filter(owner=request.user, listing=listing).delete()
+    # If button clicked on watchlist site, then redirect back to watchlist site
+    # If button clicked on viewlisting site, then redirect back to watchlist site
     if request.POST.get("addorremove") == "watchlist":
         return redirect('watchlist')
     else:
@@ -194,6 +199,8 @@ def placebid(request, id):
         listing = Listing.objects.get(id=id)
         highestbid = float(Bid.objects.filter(listing=listing).order_by('-value').first().value)
         bidcounter = Bid.objects.filter(listing=listing).count()
+        # bidcounter == 1 means that no one bid for the listing yet
+        # The first bid is the auction creator's bid
         if bidcounter == 1:
             if bidvalue >= highestbid:
                 newBid = Bid(owner=request.user, value=bidvalue, listing=listing, date=datetime.datetime.now())
