@@ -2,6 +2,8 @@
 ## CS50 Web Programming with JavaScript and Python
 ### Project 2 - Commerce
 
+#### CRUD application written in Django that uses ORM to maintain the functionalities.
+
 Demo Video: coming soon
 
 Logged user can:
