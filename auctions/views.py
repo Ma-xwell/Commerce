@@ -82,7 +82,10 @@ def createlisting(request):
             if form.cleaned_data['category']:
                 category = Category.objects.get(category_type=form.cleaned_data['category'])
             else:
-                category = Category.objects.get(category_type="O")
+                category = Category.objects.get(category_type="NO")
+            if not title or not content or not starting_bid:
+                messages.error = "Please provide all the required information"
+                return redirect('createlisting')
             newListing = Listing(owner=user, title=title, content=content, photo_url=photo_url, starting_bid=starting_bid, category=category, date=datetime.datetime.now())
             newListing.save()
             # Starting bid is the first bid on each listing

@@ -1,9 +1,33 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <form action="{% url 'createlisting' %}" method="POST">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit">
-    </form>
+    <h4>Create your own listing</h4>
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags %}<strong>{{ message }}</strong>{% endif %}
+        {% endfor %}    
+    {% endif %}
+    <div class="formlisting">
+        <form action="{% url 'createlisting' %}" method="POST">
+        {% csrf_token %}
+        <div class="formgroup">
+            {{ form.title }}
+        </div>
+        <div class="formgroup">
+            {{ form.content }} 
+        </div>
+        <div class="formgroup">
+            {{ form.photo_url }} 
+        </div>
+        <div class="formgroup">
+            {{ form.starting_bid }} 
+        </div>
+        <div class="formgroup">
+            {{ form.category }} 
+        </div>
+        <div class="formgroup">
+            <input class="btn btn-success" type="submit" value="Create listing">
+        </div>
+        </form>
+    </div>
 {% endblock %}

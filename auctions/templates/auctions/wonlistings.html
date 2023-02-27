@@ -1,23 +1,29 @@
 {% extends "auctions/layout.html" %}
 
 {% load humanize %}
+{% load static %}
 
 {% block body %}
-    <h2>Won listings</h2>
+    <h3>Won listings</h3>
     <h5>Below is the list of all the auction you have won!</h5>
     <h5>Congratulations!</h5>
-    <ul style="list-style: none; padding: 0px">
+    <ul class="ullistings">
     {% for listing in listings %}
         <li>
         <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.listing.id %}'">
         <div class="listingimage">
-            <img src="{{ listing.listing.photo_url }}" alt="{{ listing.title }}">
+            {% if listing.listing.photo_url %}
+                <img src="{{ listing.listing.photo_url }}" alt="{{ listing.title }}">
+            {% else %}
+                <img src="{% static 'auctions/images/Noimage.jpg' %}" alt="{{ listing.title }}">
+            {% endif %}
         </div>
         <div class="listingcontent">
             <h4><strong>{{ listing.listing.title }}</strong></h4>
-            <div class="description">{{ listing.listing.listing_won.content }}</div>
-            <br><strong>Final price:</strong> ${{ listing.listing.listing_bid.last.value|floatformat:2|intcomma }}
-            <br><i>Category: {{ listing.listing.category.get_category_type_display }}</i>
+            <br><strong>Final price:</strong><span class="price"> ${{ listing.listing.listing_bid.last.value|floatformat:2|intcomma }}</span>
+            <div class="bar">&nbsp;</div>
+            <div class="description">{{ listing.listing.listing_won.content|truncatechars:100 }}</div>
+            <span class="category"><br><i>Category: {{ listing.listing.category.get_category_type_display }}</i></span>
         </div>
         </div>
         </li>

@@ -1,89 +1,112 @@
 {% extends "auctions/layout.html" %}
 
 {% load humanize %}
+{% load static %}
 
 {% block body %}
-        <h3><strong>Listing: {{ listing.title }}</strong></h3>
-        {% if listing.active %}
-                <span style="color: green">ACTIVE</span>
-        {% else %}
-                <span style="color: red">INACTIVE</span>
-        {% endif %}
-        <br><i>Listed by: <a href="{% url 'userlistings' listing.owner %}">{{ listing.owner }}</a></i>
-
-        <br><i>Category: {{ listing.category.get_category_type_display }}</i>
+        <div class="titlelisting">
+                <h3 style="width: 100%"><strong>{{ listing.title }}</strong></h3>
+                <div class="itemneartitle">
+                {% if listing.active %}
+                        <span style="color: green">ACTIVE</span>
+                {% else %}
+                        <span style="color: red">INACTIVE</span>
+                {% endif %}
+                <br><i>Listed by: <a href="{% url 'userlistings' listing.owner %}">{{ listing.owner }}</a></i>
+                <br><i>Category: {{ listing.category.get_category_type_display }}</i>   
+                </div>
+        </div>
         {% if user.is_authenticated %}
                 <form action="{% url 'addtowatchlist' listing.id %}" method="POST">
                         {% csrf_token %}
                         <input type="hidden" value="viewlisting" name="addorremove">
                         {% if watchlist == True %}
-                                <input type="submit" value="Remove from watchlist">
+                                <input class="btn btn-danger" type="submit" value="Remove from watchlist">
                         {% else %}
-                                <input type="submit" value="Add to watchlist">
+                                <input class="btn btn-success" type="submit" value="Add to watchlist">
                         {% endif %}
                 </form>
         {% endif %}
-        <br><img src=" {{ listing.photo_url }}" alt=" {{ listing.title }}" style="max-width: 300px">
-        <br>{{ listing.content }}
-        <br><h3>{% if listing.active %}Current bid:{% else %}Final price:{% endif %} ${{ bid.first.value|floatformat:2|intcomma }}</h3>
-        <br>
-        {% if listing.active %}
-                {% if user == listing.owner and user.is_authenticated %}
-                        {% if bidcounter == 1 %}
-                                No bids so far.
-                        {% else %}
-                                {{ bidcounter|add:"-1" }} bid(s) so far.
-                        {% endif %}
-                        <form action="{% url 'closelisting' listing.id %}" method="POST">
-                                {% csrf_token %}
-                                <input type="submit" value="Close the listing">
-                        </form>
-                {% elif user != listing.owner and user.is_authenticated %}
-                        {% if bidcounter == 1 %}
-                                No bids so far.
-                        {% else %}
-                                {{ bidcounter|add:"-1" }} bid(s) so far.
-                                {% if user == highestbidowner %}
-                                        <strong>Your bid is the highest</strong>
-                                {% endif%}
-                        {% endif %}
-                        <form action="{% url 'placebid' listing.id %}" method="POST">
-                                {% csrf_token %}
-                                <input type="number" step="0.1" min="{{ bid.first.value }}" value="{{ bid.first.value }}" name="bidvalue" required>
-                                <input type="submit"value="Place the bid!">
-                        </form>
-                        {% if messages %}
-                        {% for message in messages %}
-                                {% if message.tags %}<strong>{{ message }}</strong>{% endif %}
-                        {% endfor %}    
-                        {% endif %}
-                {% endif %}
-        {% else %}
-                This auction has ended with {{ bidcounter|add:"-1" }} bid(s).<br>
-                {% if user.is_authenticated and user == winner and user != listing.owner %}
-                        Congratulations, you have won this auction!
-                {% elif user.is_authenticated and user != winner and user != listing.owner %}
-                        Unfortunately, you have not won this auction. Go see <a href="{% url 'index' %}">other items listed!</a>
-                {% elif user.is_authenticated and user != winner and user == listing.owner %}
-                        User who won the auction: {{ winner }}
-                {% elif user.is_authenticated and user == winner and user == listing.owner %}
-                        Unfortunately, no one bid for your auction. 
-                {% endif %}
-        {% endif %}
-        <h4>Comment section</h4>
-        {% if user.is_authenticated %}
-                <form action="{% url 'comment' listing.id %}" method="POST">
-                        {% csrf_token %}
-                        {{ form_comment }}
-                        <input type="submit" value="Add Comment">
-                </form>
-        {% endif %}
-        <ul style="list-style: none; padding: 0px">
-        {% for comment in comments %}
-                <li>{{ comment.content }}<br><i>added on {{ comment.date }}</i></li>
+        <div class="listingcontent">
                 <br>
-        {% empty %}
-                No comments yet!
-        {% endfor %}
-        </ul>
+                {% if listing.photo_url %}
+                        <img src="{{ listing.photo_url }}" alt="{{ listing.title }}" style="max-width: 600px">
+                {% else %}
+                        <img src="{% static 'auctions/images/Noimage.jpg' %}" alt="{{ listing.title }}">
+                {% endif %}
+                <br>
+                <div class="descriptioncontent">{{ listing.content }}</div>
+                <br><h3>{% if listing.active %}Current bid:{% else %}Final price:{% endif %} ${{ bid.first.value|floatformat:2|intcomma }}</h3>
+                <br>
+                {% if listing.active %}
+                        {% if user == listing.owner and user.is_authenticated %}
+                                {% if bidcounter == 1 %}
+                                        No bids so far.
+                                {% else %}
+                                        {{ bidcounter|add:"-1" }} bid(s) so far.
+                                {% endif %}
+                                <form action="{% url 'closelisting' listing.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <input class="btn btn-success" type="submit" value="Close the listing">
+                                </form>
+                        {% elif user != listing.owner and user.is_authenticated %}
+                                {% if bidcounter == 1 %}
+                                        No bids so far.
+                                {% else %}
+                                        {{ bidcounter|add:"-1" }} bid(s) so far.
+                                        {% if user == highestbidowner %}
+                                                <strong>Your bid is the highest</strong>
+                                        {% endif%}
+                                {% endif %}
+                                <form action="{% url 'placebid' listing.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="number" step="0.1" min="{{ bid.first.value }}" value="{{ bid.first.value }}" name="bidvalue" required>
+                                        <input type="submit"value="Place the bid!">
+                                </form>
+                                {% if messages %}
+                                {% for message in messages %}
+                                        {% if message.tags %}<strong>{{ message }}</strong>{% endif %}
+                                {% endfor %}    
+                                {% endif %}
+                        {% endif %}
+                {% else %}
+                        This auction has ended with {{ bidcounter|add:"-1" }} bid(s).<br>
+                        {% if user.is_authenticated and user == winner and user != listing.owner %}
+                                Congratulations, you have won this auction!
+                        {% elif user.is_authenticated and user != winner and user != listing.owner %}
+                                Unfortunately, you have not won this auction. Go see <a href="{% url 'index' %}">other items listed!</a>
+                        {% elif user.is_authenticated and user != winner and user == listing.owner %}
+                                User who won the auction: {{ winner }}
+                        {% elif user.is_authenticated and user == winner and user == listing.owner %}
+                                Unfortunately, no one bid for your auction. 
+                        {% endif %}
+                {% endif %}
+        </div>
+        <br><div class="bar" style="margin-top: 5px;">&nbsp;</div>
+        <div class="commentsection">
+                <h4>Comment section</h4>
+                {% if user.is_authenticated %}
+                        <form action="{% url 'comment' listing.id %}" method="POST">
+                                {% csrf_token %}
+                                <div class="formgroup">
+                                        {{ form_comment }}
+                                </div>
+                                <div class="formgroup">
+                                        <input class="btn btn-success" type="submit" value="Add Comment">
+                                </div>
+                        </form>
+                {% endif %}
+                <ul style="list-style: none; padding: 0px">
+                {% for comment in comments %}
+                        <li>
+                                {{ comment.content }}
+                                <br>
+                                <i style="font-size: x-small;">added on {{ comment.date }}</i>
+                        </li>
+                        <br>
+                {% empty %}
+                        No comments yet!
+                {% endfor %}
+                </ul>
+        </div>
 {% endblock %}

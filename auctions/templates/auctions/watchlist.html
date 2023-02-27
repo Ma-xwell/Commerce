@@ -1,29 +1,41 @@
 {% extends "auctions/layout.html" %}
 
 {% load humanize %}
+{% load static %}
 
 {% block body %}
-    <h1>Watchlist</h1>
+    <h3>Watchlist</h3>
+    <ul class="ullistings">
     {% for listing in watchlist %}
         <li>
         <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.listing.id %}'">
         <div class="listingimage">
-            <img src="{{ listing.listing.photo_url }}" alt="{{ listing.listing.title }}">
+            {% if listing.listing.photo_url %}
+                <img src="{{ listing.listing.photo_url }}" alt="{{ listing.title }}">
+            {% else %}
+                <img src="{% static 'auctions/images/Noimage.jpg' %}" alt="{{ listing.title }}">
+            {% endif %}
         </div>
         <div class="listingcontent">
-            <h4><strong>{{ listing.listing.title }}</strong></h4>
-            <form action="{% url 'addtowatchlist' listing.listing.id %}" method="POST">
-                {% csrf_token %}
-                <input type="hidden" value="watchlist" name="addorremove">
-                <button type="submit" class="btn-close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </form>
-            <div class="description">{{ listing.listing.content }}</div>
-            <br><strong>Price:</strong> ${{ listing.listing.listing_bid.last.value|floatformat:2|intcomma }}
-            <br><i>Category: {{ listing.listing.category.get_category_type_display }}</i>
+            <div class="titlelisting">
+                <h4 style="width: 100%"><strong>{{ listing.listing.title }}</strong></h4>
+                <div class="itemneartitle">
+                <form action="{% url 'addtowatchlist' listing.listing.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" value="watchlist" name="addorremove">
+                    <button type="submit" class="btn-close btn-danger" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </form>
+                </div>
+            </div>
+            <br><strong>Price:</strong><span class="price"> ${{ listing.listing.listing_bid.last.value|floatformat:2|intcomma }}</span>
+            <div class="bar">&nbsp;</div>
+            <div class="description">{{ listing.listing.content|truncatechars:100 }}</div>
+            <span class="category"><br><i>Category: {{ listing.listing.category.get_category_type_display }}</i></span>
         </div>
         </div>
         </li>
     {% empty %}
         <h2>No listings on your watchlist!</h2>
     {% endfor %}
+    </ul>
 {% endblock %}

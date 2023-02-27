@@ -1,28 +1,41 @@
 {% extends "auctions/layout.html" %}
 
 {% load humanize %}
+{% load static %}
 
 {% block body %}
+    <ul class="ullistings">
     {% for listing in listings %}
         <li>
         <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.id %}'">
         <div class="listingimage">
-            <img src="{{ listing.photo_url }}" alt="{{ listing.title }}">
+            {% if listing.photo_url %}
+                <img src="{{ listing.photo_url }}" alt="{{ listing.title }}">
+            {% else %}
+                <img src="{% static 'auctions/images/Noimage.jpg' %}" alt="{{ listing.title }}">
+            {% endif %}
         </div>
         <div class="listingcontent">
-            <h4><strong>{{ listing.title }}</strong></h4>
-            <div class="description">{{ listing.content }}</div>
-            <br><strong>Price:</strong> ${{ listing.listing_bid.last.value|floatformat:2|intcomma }}
-            <br><i>Category: {{ listing.category.get_category_type_display }}</i>
+            <div class="titlelisting">
+            <h4 style="width: 100%"><strong>{{ listing.title }}</strong></h4>
+            <div class="itemneartitle">
+                {% if listing.active %}
+                    <span style="color: green">ACTIVE</span>
+                {% else %}
+                    <span style="color: red">INACTIVE</span>
+                {% endif %}
+            </div>
+            </div>
+            <br><strong>Price:</strong><span class="price"> ${{ listing.listing_bid.last.value|floatformat:2|intcomma }}</span>
+            <div class="bar">&nbsp;</div>
+            <div class="description">{{ listing.content|truncatechars:100 }}</div>
+            <span class="category"><br><i>Category: {{ listing.category.get_category_type_display }}</i></span>
         </div>
-        {% if listing.active %}
-            <span style="color: green">ACTIVE</span>
-        {% else %}
-            <span style="color: red">INACTIVE</span>
-        {% endif %}
+        
         </div>
         </li>
     {% empty %}
         You have no listings.
     {% endfor%}
+    </ul>
 {% endblock %}

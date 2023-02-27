@@ -1,34 +1,186 @@
+@font-face {
+    font-family: 'Lora';
+    src: url('../auctions/fonts/Lora-Regular.ttf') format('truetype');
+}
+
 body {
+    padding: 0;
+    font-family: Lora, Helvetica, sans-serif;
+    background-color:rgb(255, 255, 240);
+}
+
+.topbar{
+    width: 100%;
+    background-color: rgb(25, 84, 17);
+    padding: 10px 10px 5px 15px;
+}
+
+.logo {
+    border: 1px solid rgba(16, 67, 10, 0.764);
+}
+
+.signed {
+    user-select: none;
+    color: rgb(255, 253, 208);
+    margin-top: 10px;
+}
+
+.maincontent {
     padding: 10px;
+}
+
+.ullistings {
+    list-style: none; 
+    padding: 0px;
+}
+
+.lilisting {
+    border: 0;
 }
 
 .listing {
     display: flex;
     cursor: pointer;
-    border: solid 1px black;
-    margin: 10px;
-    height: 200px;
+    padding: 10px;
+    height: 250px;
+}
+
+.listing:hover {
+    background-color: rgba(245, 245, 220);
 }
 
 .listingcontent {
-    float: left;
+    display: flex;
+    align-items: start;
+    width: 100%;
+    max-width: 100%;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 10px;
+    flex-wrap: wrap;
 }
 
 .listingimage {
-    padding: 10px;
-    width: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0px;
+    width: 30%;
 }
 
 .listingimage img {
     max-height: 100%;
-    max-width: 300px;
+    max-width: 100%;
+    padding: 10px;
 }
 
 .description {
-    display: inline-block;
+    display: flex;
     max-width: 80%;
-    max-height: 50%;
+    max-height: 3em;
     text-overflow: ellipsis;
-    overflow: hidden;
+    padding-top: 10px;
+    overflow-wrap: break-word;
+    line-height: 1.2;
+}
+
+.descriptioncontent {
+    overflow-wrap: break-word;
+    max-width: 95%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.category {
+    margin-top: auto;
+}
+
+.price {
+    font-size: large;
+}
+
+.bar {
+    height: 1px;
+    width: 100%;
+    background-color: rgb(198, 198, 198);
+}
+
+.titlelisting {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.itemneartitle {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items:end;
+}
+
+.nav-link {
+    color: rgb(255, 253, 208);
+    padding-left: 0;
+}
+
+.nav-link:hover {
+    color: rgb(230, 230, 250);
+}
+
+.formgroup {
+    width: 100%;
+    padding: 10px;
+}
+
+.formelement, .formdescription {
+    border: 0;
+    border-radius: 10px;
+    box-shadow: 0 0 15px 4px rgba(0,0,0,0.06);
+    width: 40%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.formdescription {
+    width: 40%;
+    height: 200px;
+}
+
+.formdescription:focus, .formelement:focus {
+    outline: none;
+    border: solid 1px rgb(138, 138, 138);
+}
+
+.formdescription::placeholder, .formelement::placeholder {
+    padding-left: 15px;
+}
+
+.btn-success {
+    background-color: rgb(111, 201, 111);
+}
+
+.btn-danger {
+    background-color: rgb(201, 111, 111);
+}
+
+.btn-success, .btn-danger {
+    height: 35px;
+    border: 0;
+    box-shadow: 0 0 15px 4px rgba(0,0,0,0.06);
+}
+
+.btn-success:hover {
+    background-color: rgb(76, 164, 76);
+}
+
+.btn-danger:hover {
+    background-color: rgb(164, 76, 76);
+}
+
+.commentsection {
+    padding: 10px;
+}
+
+a {
+    color: rgb(0, 114, 198);
 }
