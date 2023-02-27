@@ -13,7 +13,7 @@ import datetime
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.filter(active=True),
+        "listings": Listing.objects.filter(active=True).order_by('-date'),
         "bid": Bid.objects.order_by('value')
     })
 
@@ -139,7 +139,7 @@ def viewlisting(request, id):
 def userlistings(request, username):
     user = User.objects.get(username=username)
     return render(request, "auctions/userlistings.html", {
-        "listings": Listing.objects.filter(owner=user),
+        "listings": Listing.objects.filter(owner=user).order_by('-date'),
         "bid": Bid.objects.order_by('value')
     })
     
@@ -155,7 +155,7 @@ def category(request, category):
             category_type = category_name[0]
             break
     
-    listings = Listing.objects.filter(category=Category.objects.get(category_type=category_type), active=True)
+    listings = Listing.objects.filter(category=Category.objects.get(category_type=category_type), active=True).order_by('-date')
     return render(request, "auctions/category.html", {
         "listings": listings,
         "category": category
@@ -233,7 +233,7 @@ def closelisting(request, id):
 
 def closedlistings(request):
     return render(request, "auctions/closedlistings.html", {
-        "listings": Listing.objects.filter(active=False),
+        "listings": Listing.objects.filter(active=False).order_by('-date'),
         "bid": Bid.objects.order_by('value')
     })
 
@@ -244,7 +244,7 @@ def wonlistings(request):
     # Such listings won't be shown as "won", but will be present in "My listings" tab
     
     # List of listing IDs which logged user is not an owner of
-    listing_ids = Listing.objects.filter(~Q(owner=request.user)).values_list('id', flat=True)
+    listing_ids = Listing.objects.filter(~Q(owner=request.user)).values_list('id', flat=True).order_by('-date')
     # QuerySet of listings which were won by the logged user, but without these which were created by them
     wonlistings = Winner.objects.filter(winner=request.user, listing__id__in=listing_ids)
     

@@ -30,7 +30,7 @@
         <div class="listingcontent">
                 <br>
                 {% if listing.photo_url %}
-                        <img src="{{ listing.photo_url }}" alt="{{ listing.title }}" style="max-width: 600px">
+                        <img src="{{ listing.photo_url }}" alt="{{ listing.title }}" style="max-width: 600px; max-height: 500px">
                 {% else %}
                         <img src="{% static 'auctions/images/Noimage.jpg' %}" alt="{{ listing.title }}">
                 {% endif %}

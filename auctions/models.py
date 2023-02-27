@@ -37,7 +37,7 @@ class Listing(models.Model):
     photo_url = models.URLField(max_length=500, null=True)
     starting_bid = models.FloatField(validators=[MinValueValidator(1)])
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category_listing")
-    date = models.DateField(default=datetime.date.today, null=True)
+    date = models.DateTimeField(default=datetime.date.today, null=True)
     active = models.BooleanField(default=True)
     
     def __str__(self):
