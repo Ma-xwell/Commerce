@@ -4,6 +4,12 @@
 
 Demo Video: coming soon
 
+Logged user can:
+- **create** own listing, comments
+- **read** the existing listings, comments
+- **update** the listing by biding on it or closing it (if the user is a creator of the listing)
+- **delete** items from watchlist
+
 Main page ("Categories->{category}", "Watchlist", "My Listings" and "Won Listings" look similarly):
 ![obraz](https://user-images.githubusercontent.com/81234472/221517426-fb11544a-e8e8-4890-a733-7f40780b67c0.png)
 
