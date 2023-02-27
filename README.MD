@@ -5,7 +5,7 @@
 Demo Video: coming soon
 
 Main page ("Categories->{category}", "Watchlist", "My Listings" and "Won Listings" look similarly):
-![obraz](https://user-images.githubusercontent.com/81234472/221516720-e0f57cb7-70d6-446d-9842-e4e0a1aa822e.png)
+![obraz](https://user-images.githubusercontent.com/81234472/221517426-fb11544a-e8e8-4890-a733-7f40780b67c0.png)
 
 Listing page:
 ![obraz](https://user-images.githubusercontent.com/81234472/221516889-def38b2c-7bbe-417d-8ce1-5acf97b60853.png)
