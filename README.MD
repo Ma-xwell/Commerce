@@ -4,8 +4,6 @@
 
 #### CRUD application written in Django that uses ORM to maintain the functionalities.
 
-Demo Video: coming soon
-
 Logged user can:
 - **create** own listing, comments
 - **read** the existing listings, comments
