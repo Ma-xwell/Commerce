@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator
-import datetime
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -37,7 +37,7 @@ class Listing(models.Model):
     photo_url = models.URLField(max_length=500, null=True)
     starting_bid = models.FloatField(validators=[MinValueValidator(1)])
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category_listing")
-    date = models.DateTimeField(default=datetime.date.today, null=True)
+    date = models.DateTimeField(default=timezone.now, null=True)
     active = models.BooleanField(default=True)
     
     def __str__(self):
@@ -48,14 +48,14 @@ class Bid(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bid_owner", null=True)
     value = models.FloatField(validators=[MinValueValidator(1)], null=True)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="listing_bid", null=True)
-    date = models.DateField(default=datetime.date.today, null=True)
+    date = models.DateField(default=timezone.now, null=True)
     
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comment_owner", null=True)
     content = models.CharField(max_length=2500, null=True)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="listing_comment", null=True)
-    date = models.DateTimeField(default=datetime.date.today, null=True)
+    date = models.DateTimeField(default=timezone.now, null=True)
     
 class Watchlist(models.Model):
     id = models.AutoField(primary_key=True)
