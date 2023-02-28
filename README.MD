@@ -1,5 +1,5 @@
 # Ma-xwell
-## CS50 Web Programming with JavaScript and Python
+## CS50 Web Programming with Python and JavaScript
 ### Project 2 - Commerce
 
 #### CRUD application written in Django that uses ORM to maintain the functionalities.
