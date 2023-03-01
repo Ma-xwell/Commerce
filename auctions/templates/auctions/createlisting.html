@@ -8,7 +8,7 @@
         {% endfor %}    
     {% endif %}
     <div class="formlisting">
-        <form action="{% url 'createlisting' %}" method="POST">
+        <form action="{% url 'create_listing' %}" method="POST">
         {% csrf_token %}
         <div class="formgroup">
             {{ form.title }}

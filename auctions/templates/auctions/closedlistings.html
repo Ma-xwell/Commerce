@@ -8,7 +8,7 @@
     <ul class="ullistings">
     {% for listing in listings %}
         <li>
-        <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.id %}'">
+        <div class="listing" onclick="window.location.href = '{% url 'view_listing' listing.id %}'">
         <div class="listingimage">
             {% if listing.photo_url %}
                 <img src="{{ listing.photo_url }}" alt="{{ listing.title }}">

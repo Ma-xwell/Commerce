@@ -12,14 +12,14 @@
                 {% else %}
                         <span style="color: red">INACTIVE</span>
                 {% endif %}
-                <br><i>Listed by: <a href="{% url 'userlistings' listing.owner %}">{{ listing.owner }}</a></i>
+                <br><i>Listed by: <a href="{% url 'user_listings' listing.owner %}">{{ listing.owner }}</a></i>
                 <br><i>Category: {{ listing.category.get_category_type_display }}</i>   
                 </div>
         </div>
         {% if user.is_authenticated %}
-                <form action="{% url 'addtowatchlist' listing.id %}" method="POST">
+                <form action="{% url 'add_or_remove_from_watchlist' listing.id %}" method="POST">
                         {% csrf_token %}
-                        <input type="hidden" value="viewlisting" name="addorremove">
+                        <input type="hidden" value="view_listing" name="add_or_remove_from_watchlist">
                         {% if watchlist == True %}
                                 <input class="btn btn-danger" type="submit" value="Remove from watchlist">
                         {% else %}
@@ -40,25 +40,25 @@
                 <br>
                 {% if listing.active %}
                         {% if user == listing.owner and user.is_authenticated %}
-                                {% if bidcounter == 1 %}
+                                {% if bid_counter == 1 %}
                                         No bids so far.
                                 {% else %}
-                                        {{ bidcounter|add:"-1" }} bid(s) so far.
+                                        {{ bid_counter|add:"-1" }} bid(s) so far.
                                 {% endif %}
-                                <form action="{% url 'closelisting' listing.id %}" method="POST">
+                                <form action="{% url 'close_listing' listing.id %}" method="POST">
                                         {% csrf_token %}
                                         <input class="btn btn-success" type="submit" value="Close the listing">
                                 </form>
                         {% elif user != listing.owner and user.is_authenticated %}
-                                {% if bidcounter == 1 %}
+                                {% if bid_counter == 1 %}
                                         No bids so far.
                                 {% else %}
-                                        {{ bidcounter|add:"-1" }} bid(s) so far.
-                                        {% if user == highestbidowner %}
+                                        {{ bid_counter|add:"-1" }} bid(s) so far.
+                                        {% if user == highest_bid_owner %}
                                                 <strong>Your bid is the highest</strong>
                                         {% endif%}
                                 {% endif %}
-                                <form action="{% url 'placebid' listing.id %}" method="POST">
+                                <form action="{% url 'place_bid' listing.id %}" method="POST">
                                         {% csrf_token %}
                                         <input type="number" step="0.1" min="{{ bid.first.value }}" value="{{ bid.first.value }}" name="bidvalue" required>
                                         <input type="submit"value="Place the bid!">
@@ -70,7 +70,7 @@
                                 {% endif %}
                         {% endif %}
                 {% else %}
-                        This auction has ended with {{ bidcounter|add:"-1" }} bid(s).<br>
+                        This auction has ended with {{ bid_counter|add:"-1" }} bid(s).<br>
                         {% if user.is_authenticated and user == winner and user != listing.owner %}
                                 Congratulations, you have won this auction!
                         {% elif user.is_authenticated and user != winner and user != listing.owner %}

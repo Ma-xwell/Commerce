@@ -8,11 +8,11 @@
     {% if not listings %}
         No active listings.<br>
     {% endif %}
-    <span style="font-size: x-small"><a href="{% url 'closedlistings'%}">see inactive listings</a></span>
+    <span style="font-size: x-small"><a href="{% url 'closed_listings'%}">see inactive listings</a></span>
     <ul class="ullistings">
     {% for listing in listings %}
         <li class="lilisting">
-        <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.id %}'">
+        <div class="listing" onclick="window.location.href = '{% url 'view_listing' listing.id %}'">
         <div class="listingimage">
             {% if listing.photo_url %}
                 <img src="{{ listing.photo_url }}" alt="{{ listing.title }}">

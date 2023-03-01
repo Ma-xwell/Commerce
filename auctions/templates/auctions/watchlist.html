@@ -8,7 +8,7 @@
     <ul class="ullistings">
     {% for listing in watchlist %}
         <li>
-        <div class="listing" onclick="window.location.href = '{% url 'viewlisting' listing.listing.id %}'">
+        <div class="listing" onclick="window.location.href = '{% url 'view_listing' listing.listing.id %}'">
         <div class="listingimage">
             {% if listing.listing.photo_url %}
                 <img src="{{ listing.listing.photo_url }}" alt="{{ listing.title }}">
@@ -20,9 +20,9 @@
             <div class="titlelisting">
                 <h4 style="width: 100%"><strong>{{ listing.listing.title }}</strong></h4>
                 <div class="itemneartitle">
-                <form action="{% url 'addtowatchlist' listing.listing.id %}" method="POST">
+                <form action="{% url 'add_or_remove_from_watchlist' listing.listing.id %}" method="POST">
                     {% csrf_token %}
-                    <input type="hidden" value="watchlist" name="addorremove">
+                    <input type="hidden" value="watchlist" name="add_or_remove_from_watchlist">
                     <button type="submit" class="btn-close btn-danger" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </form>
                 </div>
