@@ -84,11 +84,11 @@ def create_listing(request):
             if not title or not content or not starting_bid:
                 messages.error = "Please provide all the required information"
                 return redirect('create_listing')
-            newListing = Listing(owner=user, title=title, content=content, photo_url=photo_url, starting_bid=starting_bid, category=category, date=date)
-            newListing.save()
+            new_listing = Listing(owner=user, title=title, content=content, photo_url=photo_url, starting_bid=starting_bid, category=category, date=date)
+            new_listing.save()
             # Starting bid is the first bid on each listing
-            firstBid = Bid(owner=user, value=starting_bid, listing=newListing, date=date)
-            firstBid.save()
+            first_bid = Bid(owner=user, value=starting_bid, listing=new_listing, date=date)
+            first_bid.save()
 
         return HttpResponseRedirect(reverse("index"))
     return render(request, "auctions/createlisting.html", {
@@ -101,11 +101,9 @@ def view_listing(request, id):
     bids_ordered_by_value = bids.order_by('-value')
     bid_counter = bids.count()
     comments_ordered_by_date = listing.listing_comment.all().order_by('-date')
-    
+    winner = ''
     if Winner.objects.filter(listing=listing).exists():
         winner = Winner.objects.get(listing=listing).winner
-    else:
-        winner = None
     # Get rid of error that might appear due to changes in Django admin interface
     if bid_counter < 1:
         bid_counter = 1
@@ -126,15 +124,14 @@ def view_listing(request, id):
             "winner": winner,
             "highest_bid_owner": highest_bid_owner
         })
-    else:
-        return render(request, "auctions/viewlisting.html", {
-            "listing": listing,
-            "bid": bids_ordered_by_value,
-            "bid_counter": bid_counter,
-            "form_comment": CommentForm(),
-            "comments": comments_ordered_by_date,
-            "winner": winner
-        })
+    return render(request, "auctions/viewlisting.html", {
+        "listing": listing,
+        "bid": bids_ordered_by_value,
+        "bid_counter": bid_counter,
+        "form_comment": CommentForm(),
+        "comments": comments_ordered_by_date,
+        "winner": winner
+    })
 
 def user_listings(request, username):
     user = User.objects.get(username=username)
@@ -169,8 +166,8 @@ def comment(request, id):
             content = form.cleaned_data['content']
             listing = Listing.objects.get(id=id)
             date = datetime.datetime.now()
-            newComment = Comment(owner=user, content=content, listing=listing, date=date)
-            newComment.save()
+            new_comment = Comment(owner=user, content=content, listing=listing, date=date)
+            new_comment.save()
     return redirect('view_listing', id=int(id))
 
 def watchlist(request):
@@ -185,8 +182,8 @@ def add_or_remove_from_watchlist(request, id):
         user_watchlist = Watchlist.objects.filter(owner=request.user, listing=listing)
         # If no watchlist for logged user and specific listing exists, then create one
         if not user_watchlist.exists():
-            newWatchlist = Watchlist(owner=request.user, listing=listing)
-            newWatchlist.save()
+            new_watchlist = Watchlist(owner=request.user, listing=listing)
+            new_watchlist.save()
         # If watchlist for logged user and specific listing exists, delete it
         else:
             user_watchlist.delete()
@@ -199,27 +196,25 @@ def add_or_remove_from_watchlist(request, id):
     
 def place_bid(request, id):
     if request.method == "POST":
-        bidvalue = float(request.POST.get("bidvalue"))
+        bid_value = float(request.POST.get("bidvalue"))
         listing = Listing.objects.get(id=id)
         bid = Bid.objects.filter(listing=listing)
-        highestbid = float(bid.order_by('-value').first().value)
-        bidcounter = bid.count()
+        highest_bid = float(bid.order_by('-value').first().value)
+        bid_counter = bid.count()
         # bidcounter == 1 means that no one bid for the listing yet
         # The first bid is the auction creator's bid
-        if bidcounter == 1:
-            if bidvalue >= highestbid:
-                newBid = Bid(owner=request.user, value=bidvalue, listing=listing, date=datetime.datetime.now())
-                newBid.save()
+        if bid_counter == 1:
+            if bid_value >= highest_bid:
+                new_bid = Bid(owner=request.user, value=bid_value, listing=listing, date=datetime.datetime.now())
+                new_bid.save()
             else:
-                messages.error(request, 'Your bid must equal or higher than the current one.')
-                return redirect('viewlisting', id=int(id))
+                messages.error(request, 'Your bid must be equal or higher than the current one.')
         else:
-            if bidvalue > highestbid:
-                newBid = Bid(owner=request.user, value=bidvalue, listing=listing, date=datetime.datetime.now())
-                newBid.save()
+            if bid_value > highest_bid:
+                new_bid = Bid(owner=request.user, value=bid_value, listing=listing, date=datetime.datetime.now())
+                new_bid.save()
             else:
                 messages.error(request, 'Your bid must be higher than the current one.')
-                return redirect('view_listing', id=int(id))
     return redirect('view_listing', id=int(id))
 
 def close_listing(request, id):
